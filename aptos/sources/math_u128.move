@@ -4,7 +4,8 @@ module integer_mate::math_u128 {
 
     const HI_64_MASK: u128 = 0xffffffffffffffff0000000000000000;
     const LO_64_MASK: u128 = 0x0000000000000000ffffffffffffffff;
-    const LO_128_MASK: u256 = 0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
+    const LO_128_MASK: u256 =
+        0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
 
     const DIV_BY_ZERO: u64 = 1;
 
@@ -21,12 +22,12 @@ module integer_mate::math_u128 {
             ((sum as u128), false)
         }
     }
-    
+
     public fun wrapping_sub(n1: u128, n2: u128): u128 {
         let (result, _) = overflowing_sub(n1, n2);
         result
     }
-    
+
     public fun overflowing_sub(n1: u128, n2: u128): (u128, bool) {
         if (n1 >= n2) {
             ((n1 - n2), false)
@@ -34,12 +35,12 @@ module integer_mate::math_u128 {
             ((MAX_U128 - n2 + n1 + 1), true)
         }
     }
-    
+
     public fun wrapping_mul(n1: u128, n2: u128): u128 {
         let (m, _) = overflowing_mul(n1, n2);
         m
     }
-    
+
     public fun overflowing_mul(n1: u128, n2: u128): (u128, bool) {
         let (c0, c1) = full_mul(n1, n2);
         if (c1 > 0) {
@@ -50,8 +51,10 @@ module integer_mate::math_u128 {
     }
 
     public fun full_mul(n1: u128, n2: u128): (u128, u128) {
-        let hi_mask: u256 = 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000;
-        let lo_mask: u256 = 0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
+        let hi_mask: u256 =
+            0xffffffffffffffffffffffffffffffff00000000000000000000000000000000;
+        let lo_mask: u256 =
+            0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
         let r = (n1 as u256) * (n2 as u256);
         let hi = (((r & hi_mask) >> 128) as u128);
         let lo = ((r & lo_mask) as u128);
@@ -91,19 +94,13 @@ module integer_mate::math_u128 {
     }
 
     public fun max(num1: u128, num2: u128): u128 {
-        if (num1 > num2) {
-            num1
-        } else {
-            num2
-        }
+        if (num1 > num2) { num1 }
+        else { num2 }
     }
 
     public fun min(num1: u128, num2: u128): u128 {
-        if (num1 < num2) {
-            num1
-        } else {
-            num2
-        }
+        if (num1 < num2) { num1 }
+        else { num2 }
     }
 
     public fun add_check(num1: u128, num2: u128): bool {
@@ -137,13 +134,22 @@ module integer_mate::math_u128 {
         assert!(hi == 0 && lo == MAX_U128, 0);
 
         let (lo, hi) = full_mul(MAX_U128, 10);
-        assert!(hi == 9 && lo == 0xfffffffffffffffffffffffffffffff6, 0);
+        assert!(
+            hi == 9 && lo == 0xfffffffffffffffffffffffffffffff6,
+            0
+        );
 
         let (lo, hi) = full_mul(10, MAX_U128);
-        assert!(hi == 9 && lo == 0xfffffffffffffffffffffffffffffff6, 0);
+        assert!(
+            hi == 9 && lo == 0xfffffffffffffffffffffffffffffff6,
+            0
+        );
 
         let (lo, hi) = full_mul(MAX_U128, MAX_U128);
-        assert!(hi == 0xfffffffffffffffffffffffffffffffe && lo == 1, 0);
+        assert!(
+            hi == 0xfffffffffffffffffffffffffffffffe && lo == 1,
+            0
+        );
     }
 
     #[test]
@@ -168,6 +174,9 @@ module integer_mate::math_u128 {
         assert!(r == 100 && o == false, 0);
 
         let (r, o) = overflowing_mul(MAX_U128, 10);
-        assert!(r == 0xfffffffffffffffffffffffffffffff6 && o == true, 0);
+        assert!(
+            r == 0xfffffffffffffffffffffffffffffff6 && o == true,
+            0
+        );
     }
 }

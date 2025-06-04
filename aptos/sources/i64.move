@@ -15,30 +15,22 @@ module integer_mate::i64 {
     }
 
     public fun zero(): I64 {
-        I64 {
-            bits: 0
-        }
+        I64 { bits: 0 }
     }
 
     public fun from_u64(v: u64): I64 {
-        I64 {
-            bits: v
-        }
+        I64 { bits: v }
     }
 
     public fun from(v: u64): I64 {
         assert!(v <= MAX_AS_U64, error::invalid_argument(OVERFLOW));
-        I64 {
-            bits: v
-        }
+        I64 { bits: v }
     }
 
     public fun neg_from(v: u64): I64 {
         assert!(v <= MIN_AS_U64, error::invalid_argument(OVERFLOW));
         if (v == 0) {
-            I64 {
-                bits: v
-            }
+            I64 { bits: v }
         } else {
             I64 {
                 bits: (u64_neg(v) + 1) | (1 << 63)
@@ -55,31 +47,25 @@ module integer_mate::i64 {
             sum = a ^ b;
             carry = (a & b) << 1;
         };
-        I64 {
-            bits: sum
-        }
+        I64 { bits: sum }
     }
 
     public fun add(num1: I64, num2: I64): I64 {
         let sum = wrapping_add(num1, num2);
-        let overflow = (sign(num1) & sign(num2) & u8_neg(sign(sum))) + (u8_neg(sign(num1)) & u8_neg(sign(num2)) & sign(
-            sum
-        ));
+        let overflow =
+            (sign(num1) & sign(num2) & u8_neg(sign(sum)))
+                + (u8_neg(sign(num1)) & u8_neg(sign(num2)) & sign(sum));
         assert!(overflow == 0, error::invalid_argument(OVERFLOW));
         sum
     }
 
     public fun wrapping_sub(num1: I64, num2: I64): I64 {
-        let sub_num = wrapping_add(I64 {
-            bits: u64_neg(num2.bits)
-        }, from(1));
+        let sub_num = wrapping_add(I64 { bits: u64_neg(num2.bits) }, from(1));
         wrapping_add(num1, sub_num)
     }
 
     public fun sub(num1: I64, num2: I64): I64 {
-        let sub_num = wrapping_add(I64 {
-            bits: u64_neg(num2.bits)
-        }, from(1));
+        let sub_num = wrapping_add(I64 { bits: u64_neg(num2.bits) }, from(1));
         add(num1, sub_num)
     }
 
@@ -100,28 +86,22 @@ module integer_mate::i64 {
     }
 
     public fun abs(v: I64): I64 {
-        if (sign(v) == 0) {
-            v
-        } else {
+        if (sign(v) == 0) { v }
+        else {
             assert!(v.bits > MIN_AS_U64, error::invalid_argument(OVERFLOW));
-            I64 {
-                bits: u64_neg(v.bits - 1)
-            }
+            I64 { bits: u64_neg(v.bits - 1) }
         }
     }
 
     public fun abs_u64(v: I64): u64 {
-        if (sign(v) == 0) {
-            v.bits
-        } else {
+        if (sign(v) == 0) { v.bits }
+        else {
             u64_neg(v.bits - 1)
         }
     }
 
     public fun shl(v: I64, shift: u8): I64 {
-        I64 {
-            bits: v.bits << shift
-        }
+        I64 { bits: v.bits << shift }
     }
 
     public fun shr(v: I64, shift: u8): I64 {
@@ -130,13 +110,9 @@ module integer_mate::i64 {
         };
         let mask = 0xffffffffffffffff << (64 - shift);
         if (sign(v) == 1) {
-            return I64 {
-                bits: (v.bits >> shift) | mask
-            }
+            return I64 { bits: (v.bits >> shift) | mask }
         };
-        I64 {
-            bits: v.bits >> shift
-        }
+        I64 { bits: v.bits >> shift }
     }
 
     public fun mod(v: I64, n: I64): I64 {
@@ -191,15 +167,11 @@ module integer_mate::i64 {
     }
 
     public fun or(num1: I64, num2: I64): I64 {
-        I64 {
-            bits: (num1.bits | num2.bits)
-        }
+        I64 { bits: (num1.bits | num2.bits) }
     }
 
     public fun and(num1: I64, num2: I64): I64 {
-        I64 {
-            bits: (num1.bits & num2.bits)
-        }
+        I64 { bits: (num1.bits & num2.bits) }
     }
 
     fun u64_neg(v: u64): u64 {
@@ -242,7 +214,10 @@ module integer_mate::i64 {
         assert!(as_u64(from(10)) == 10u64, 0);
         assert!(as_u64(abs(neg_from(10))) == 10u64, 1);
         assert!(as_u64(abs(neg_from(0))) == 0u64, 2);
-        assert!(as_u64(abs(neg_from(0x7fffffffffffffff))) == 0x7fffffffffffffff, 3);
+        assert!(
+            as_u64(abs(neg_from(0x7fffffffffffffff))) == 0x7fffffffffffffff,
+            3
+        );
         assert!(as_u64(neg_from(MIN_AS_U64)) == MIN_AS_U64, 4);
     }
 
@@ -256,28 +231,88 @@ module integer_mate::i64 {
     fun test_wrapping_add() {
         assert!(as_u64(wrapping_add(from(0), from(1))) == 1, 0);
         assert!(as_u64(wrapping_add(from(1), from(0))) == 1, 0);
-        assert!(as_u64(wrapping_add(from(10000), from(99999))) == 109999, 0);
-        assert!(as_u64(wrapping_add(from(99999), from(10000))) == 109999, 0);
-        assert!(as_u64(wrapping_add(from(MAX_AS_U64 - 1), from(1))) == MAX_AS_U64, 0);
+        assert!(
+            as_u64(wrapping_add(from(10000), from(99999))) == 109999,
+            0
+        );
+        assert!(
+            as_u64(wrapping_add(from(99999), from(10000))) == 109999,
+            0
+        );
+        assert!(
+            as_u64(wrapping_add(from(MAX_AS_U64 - 1), from(1))) == MAX_AS_U64,
+            0
+        );
         assert!(as_u64(wrapping_add(from(0), from(0))) == 0, 0);
 
-        assert!(as_u64(wrapping_add(neg_from(0), neg_from(0))) == 0, 1);
-        assert!(as_u64(wrapping_add(neg_from(1), neg_from(0))) == 0xffffffffffffffff, 1);
-        assert!(as_u64(wrapping_add(neg_from(0), neg_from(1))) == 0xffffffffffffffff, 1);
-        assert!(as_u64(wrapping_add(neg_from(10000), neg_from(99999))) == 0xfffffffffffe5251, 1);
-        assert!(as_u64(wrapping_add(neg_from(99999), neg_from(10000))) == 0xfffffffffffe5251, 1);
-        assert!(as_u64(wrapping_add(neg_from(MIN_AS_U64 - 1), neg_from(1))) == MIN_AS_U64, 1);
+        assert!(
+            as_u64(wrapping_add(neg_from(0), neg_from(0))) == 0,
+            1
+        );
+        assert!(
+            as_u64(wrapping_add(neg_from(1), neg_from(0))) == 0xffffffffffffffff,
+            1
+        );
+        assert!(
+            as_u64(wrapping_add(neg_from(0), neg_from(1))) == 0xffffffffffffffff,
+            1
+        );
+        assert!(
+            as_u64(
+                wrapping_add(neg_from(10000), neg_from(99999))
+            ) == 0xfffffffffffe5251,
+            1
+        );
+        assert!(
+            as_u64(
+                wrapping_add(neg_from(99999), neg_from(10000))
+            ) == 0xfffffffffffe5251,
+            1
+        );
+        assert!(
+            as_u64(
+                wrapping_add(neg_from(MIN_AS_U64 - 1), neg_from(1))
+            ) == MIN_AS_U64,
+            1
+        );
 
-        assert!(as_u64(wrapping_add(from(0), neg_from(0))) == 0, 2);
-        assert!(as_u64(wrapping_add(neg_from(0), from(0))) == 0, 2);
-        assert!(as_u64(wrapping_add(neg_from(1), from(1))) == 0, 2);
-        assert!(as_u64(wrapping_add(from(1), neg_from(1))) == 0, 2);
-        assert!(as_u64(wrapping_add(from(10000), neg_from(99999))) == 0xfffffffffffea071, 2);
-        assert!(as_u64(wrapping_add(from(99999), neg_from(10000))) == 89999, 2);
-        assert!(as_u64(wrapping_add(neg_from(MIN_AS_U64), from(1))) == 0x8000000000000001, 2);
-        assert!(as_u64(wrapping_add(from(MAX_AS_U64), neg_from(1))) == MAX_AS_U64 - 1, 2);
+        assert!(
+            as_u64(wrapping_add(from(0), neg_from(0))) == 0,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(neg_from(0), from(0))) == 0,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(neg_from(1), from(1))) == 0,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(from(1), neg_from(1))) == 0,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(from(10000), neg_from(99999))) == 0xfffffffffffea071,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(from(99999), neg_from(10000))) == 89999,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(neg_from(MIN_AS_U64), from(1))) == 0x8000000000000001,
+            2
+        );
+        assert!(
+            as_u64(wrapping_add(from(MAX_AS_U64), neg_from(1))) == MAX_AS_U64 - 1,
+            2
+        );
 
-        assert!(as_u64(wrapping_add(from(MAX_AS_U64), from(1))) == MIN_AS_U64, 2);
+        assert!(
+            as_u64(wrapping_add(from(MAX_AS_U64), from(1))) == MIN_AS_U64,
+            2
+        );
     }
 
     #[test]
@@ -285,25 +320,61 @@ module integer_mate::i64 {
         assert!(as_u64(add(from(0), from(0))) == 0, 0);
         assert!(as_u64(add(from(0), from(1))) == 1, 0);
         assert!(as_u64(add(from(1), from(0))) == 1, 0);
-        assert!(as_u64(add(from(10000), from(99999))) == 109999, 0);
-        assert!(as_u64(add(from(99999), from(10000))) == 109999, 0);
-        assert!(as_u64(add(from(MAX_AS_U64 - 1), from(1))) == MAX_AS_U64, 0);
+        assert!(
+            as_u64(add(from(10000), from(99999))) == 109999,
+            0
+        );
+        assert!(
+            as_u64(add(from(99999), from(10000))) == 109999,
+            0
+        );
+        assert!(
+            as_u64(add(from(MAX_AS_U64 - 1), from(1))) == MAX_AS_U64,
+            0
+        );
 
         assert!(as_u64(add(neg_from(0), neg_from(0))) == 0, 1);
-        assert!(as_u64(add(neg_from(1), neg_from(0))) == 0xffffffffffffffff, 1);
-        assert!(as_u64(add(neg_from(0), neg_from(1))) == 0xffffffffffffffff, 1);
-        assert!(as_u64(add(neg_from(10000), neg_from(99999))) == 0xfffffffffffe5251, 1);
-        assert!(as_u64(add(neg_from(99999), neg_from(10000))) == 0xfffffffffffe5251, 1);
-        assert!(as_u64(add(neg_from(MIN_AS_U64 - 1), neg_from(1))) == MIN_AS_U64, 1);
+        assert!(
+            as_u64(add(neg_from(1), neg_from(0))) == 0xffffffffffffffff,
+            1
+        );
+        assert!(
+            as_u64(add(neg_from(0), neg_from(1))) == 0xffffffffffffffff,
+            1
+        );
+        assert!(
+            as_u64(add(neg_from(10000), neg_from(99999))) == 0xfffffffffffe5251,
+            1
+        );
+        assert!(
+            as_u64(add(neg_from(99999), neg_from(10000))) == 0xfffffffffffe5251,
+            1
+        );
+        assert!(
+            as_u64(add(neg_from(MIN_AS_U64 - 1), neg_from(1))) == MIN_AS_U64,
+            1
+        );
 
         assert!(as_u64(add(from(0), neg_from(0))) == 0, 2);
         assert!(as_u64(add(neg_from(0), from(0))) == 0, 2);
         assert!(as_u64(add(neg_from(1), from(1))) == 0, 2);
         assert!(as_u64(add(from(1), neg_from(1))) == 0, 2);
-        assert!(as_u64(add(from(10000), neg_from(99999))) == 0xfffffffffffea071, 2);
-        assert!(as_u64(add(from(99999), neg_from(10000))) == 89999, 2);
-        assert!(as_u64(add(neg_from(MIN_AS_U64), from(1))) == 0x8000000000000001, 2);
-        assert!(as_u64(add(from(MAX_AS_U64), neg_from(1))) == MAX_AS_U64 - 1, 2);
+        assert!(
+            as_u64(add(from(10000), neg_from(99999))) == 0xfffffffffffea071,
+            2
+        );
+        assert!(
+            as_u64(add(from(99999), neg_from(10000))) == 89999,
+            2
+        );
+        assert!(
+            as_u64(add(neg_from(MIN_AS_U64), from(1))) == 0x8000000000000001,
+            2
+        );
+        assert!(
+            as_u64(add(from(MAX_AS_U64), neg_from(1))) == MAX_AS_U64 - 1,
+            2
+        );
     }
 
     #[test]
@@ -322,34 +393,109 @@ module integer_mate::i64 {
     fun test_wrapping_sub() {
         assert!(as_u64(wrapping_sub(from(0), from(0))) == 0, 0);
         assert!(as_u64(wrapping_sub(from(1), from(0))) == 1, 0);
-        assert!(as_u64(wrapping_sub(from(0), from(1))) == as_u64(neg_from(1)), 0);
-        assert!(as_u64(wrapping_sub(from(1), from(1))) == as_u64(neg_from(0)), 0);
-        assert!(as_u64(wrapping_sub(from(1), neg_from(1))) == as_u64(from(2)), 0);
-        assert!(as_u64(wrapping_sub(neg_from(1), from(1))) == as_u64(neg_from(2)), 0);
-        assert!(as_u64(wrapping_sub(from(1000000), from(1))) == 999999, 0);
-        assert!(as_u64(wrapping_sub(neg_from(1000000), neg_from(1))) == as_u64(neg_from(999999)), 0);
-        assert!(as_u64(wrapping_sub(from(1), from(1000000))) == as_u64(neg_from(999999)), 0);
-        assert!(as_u64(wrapping_sub(from(MAX_AS_U64), from(MAX_AS_U64))) == as_u64(from(0)), 0);
-        assert!(as_u64(wrapping_sub(from(MAX_AS_U64), from(1))) == as_u64(from(MAX_AS_U64 - 1)), 0);
-        assert!(as_u64(wrapping_sub(from(MAX_AS_U64), neg_from(1))) == as_u64(neg_from(MIN_AS_U64)), 0);
-        assert!(as_u64(wrapping_sub(neg_from(MIN_AS_U64), neg_from(1))) == as_u64(neg_from(MIN_AS_U64 - 1)), 0);
-        assert!(as_u64(wrapping_sub(neg_from(MIN_AS_U64), from(1))) == as_u64(from(MAX_AS_U64)), 0);
+        assert!(
+            as_u64(wrapping_sub(from(0), from(1))) == as_u64(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(1), from(1))) == as_u64(neg_from(0)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(1), neg_from(1))) == as_u64(from(2)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(neg_from(1), from(1))) == as_u64(neg_from(2)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(1000000), from(1))) == 999999,
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(neg_from(1000000), neg_from(1)))
+                == as_u64(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(1), from(1000000))) == as_u64(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u64(
+                wrapping_sub(from(MAX_AS_U64), from(MAX_AS_U64))
+            ) == as_u64(from(0)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(MAX_AS_U64), from(1)))
+                == as_u64(from(MAX_AS_U64 - 1)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(from(MAX_AS_U64), neg_from(1)))
+                == as_u64(neg_from(MIN_AS_U64)),
+            0
+        );
+        assert!(
+            as_u64(
+                wrapping_sub(neg_from(MIN_AS_U64), neg_from(1))
+            ) == as_u64(neg_from(MIN_AS_U64 - 1)),
+            0
+        );
+        assert!(
+            as_u64(wrapping_sub(neg_from(MIN_AS_U64), from(1)))
+                == as_u64(from(MAX_AS_U64)),
+            0
+        );
     }
 
     #[test]
     fun test_sub() {
         assert!(as_u64(sub(from(0), from(0))) == 0, 0);
         assert!(as_u64(sub(from(1), from(0))) == 1, 0);
-        assert!(as_u64(sub(from(0), from(1))) == as_u64(neg_from(1)), 0);
-        assert!(as_u64(sub(from(1), from(1))) == as_u64(neg_from(0)), 0);
-        assert!(as_u64(sub(from(1), neg_from(1))) == as_u64(from(2)), 0);
-        assert!(as_u64(sub(neg_from(1), from(1))) == as_u64(neg_from(2)), 0);
-        assert!(as_u64(sub(from(1000000), from(1))) == 999999, 0);
-        assert!(as_u64(sub(neg_from(1000000), neg_from(1))) == as_u64(neg_from(999999)), 0);
-        assert!(as_u64(sub(from(1), from(1000000))) == as_u64(neg_from(999999)), 0);
-        assert!(as_u64(sub(from(MAX_AS_U64), from(MAX_AS_U64))) == as_u64(from(0)), 0);
-        assert!(as_u64(sub(from(MAX_AS_U64), from(1))) == as_u64(from(MAX_AS_U64 - 1)), 0);
-        assert!(as_u64(sub(neg_from(MIN_AS_U64), neg_from(1))) == as_u64(neg_from(MIN_AS_U64 - 1)), 0);
+        assert!(
+            as_u64(sub(from(0), from(1))) == as_u64(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(1), from(1))) == as_u64(neg_from(0)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(1), neg_from(1))) == as_u64(from(2)),
+            0
+        );
+        assert!(
+            as_u64(sub(neg_from(1), from(1))) == as_u64(neg_from(2)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(1000000), from(1))) == 999999,
+            0
+        );
+        assert!(
+            as_u64(sub(neg_from(1000000), neg_from(1))) == as_u64(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(1), from(1000000))) == as_u64(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(MAX_AS_U64), from(MAX_AS_U64))) == as_u64(from(0)),
+            0
+        );
+        assert!(
+            as_u64(sub(from(MAX_AS_U64), from(1))) == as_u64(from(MAX_AS_U64 - 1)),
+            0
+        );
+        assert!(
+            as_u64(sub(neg_from(MIN_AS_U64), neg_from(1)))
+                == as_u64(neg_from(MIN_AS_U64 - 1)),
+            0
+        );
     }
 
     #[test]
@@ -369,18 +515,48 @@ module integer_mate::i64 {
         assert!(as_u64(mul(from(1), from(1))) == 1, 0);
         assert!(as_u64(mul(from(10), from(10))) == 100, 0);
         assert!(as_u64(mul(from(100), from(100))) == 10000, 0);
-        assert!(as_u64(mul(from(10000), from(10000))) == 100000000, 0);
+        assert!(
+            as_u64(mul(from(10000), from(10000))) == 100000000,
+            0
+        );
 
-        assert!(as_u64(mul(neg_from(1), from(1))) == as_u64(neg_from(1)), 0);
-        assert!(as_u64(mul(neg_from(10), from(10))) == as_u64(neg_from(100)), 0);
-        assert!(as_u64(mul(neg_from(100), from(100))) == as_u64(neg_from(10000)), 0);
-        assert!(as_u64(mul(neg_from(10000), from(10000))) == as_u64(neg_from(100000000)), 0);
+        assert!(
+            as_u64(mul(neg_from(1), from(1))) == as_u64(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u64(mul(neg_from(10), from(10))) == as_u64(neg_from(100)),
+            0
+        );
+        assert!(
+            as_u64(mul(neg_from(100), from(100))) == as_u64(neg_from(10000)),
+            0
+        );
+        assert!(
+            as_u64(mul(neg_from(10000), from(10000))) == as_u64(neg_from(100000000)),
+            0
+        );
 
-        assert!(as_u64(mul(from(1), neg_from(1))) == as_u64(neg_from(1)), 0);
-        assert!(as_u64(mul(from(10), neg_from(10))) == as_u64(neg_from(100)), 0);
-        assert!(as_u64(mul(from(100), neg_from(100))) == as_u64(neg_from(10000)), 0);
-        assert!(as_u64(mul(from(10000), neg_from(10000))) == as_u64(neg_from(100000000)), 0);
-        assert!(as_u64(mul(from(MIN_AS_U64 / 2), neg_from(2))) == as_u64(neg_from(MIN_AS_U64)), 0);
+        assert!(
+            as_u64(mul(from(1), neg_from(1))) == as_u64(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u64(mul(from(10), neg_from(10))) == as_u64(neg_from(100)),
+            0
+        );
+        assert!(
+            as_u64(mul(from(100), neg_from(100))) == as_u64(neg_from(10000)),
+            0
+        );
+        assert!(
+            as_u64(mul(from(10000), neg_from(10000))) == as_u64(neg_from(100000000)),
+            0
+        );
+        assert!(
+            as_u64(mul(from(MIN_AS_U64 / 2), neg_from(2))) == as_u64(neg_from(MIN_AS_U64)),
+            0
+        );
     }
 
     #[test]
@@ -394,11 +570,20 @@ module integer_mate::i64 {
     fun test_div() {
         assert!(as_u64(div(from(0), from(1))) == 0, 0);
         assert!(as_u64(div(from(10), from(1))) == 10, 0);
-        assert!(as_u64(div(from(10), neg_from(1))) == as_u64(neg_from(10)), 0);
-        assert!(as_u64(div(neg_from(10), neg_from(1))) == as_u64(from(10)), 0);
+        assert!(
+            as_u64(div(from(10), neg_from(1))) == as_u64(neg_from(10)),
+            0
+        );
+        assert!(
+            as_u64(div(neg_from(10), neg_from(1))) == as_u64(from(10)),
+            0
+        );
 
         assert!(abs_u64(neg_from(MIN_AS_U64)) == MIN_AS_U64, 0);
-        assert!(as_u64(div(neg_from(MIN_AS_U64), from(1))) == MIN_AS_U64, 0);
+        assert!(
+            as_u64(div(neg_from(MIN_AS_U64), from(1))) == MIN_AS_U64,
+            0
+        );
     }
 
     #[test]
@@ -410,16 +595,28 @@ module integer_mate::i64 {
     #[test]
     fun test_shl() {
         assert!(as_u64(shl(from(10), 0)) == 10, 0);
-        assert!(as_u64(shl(neg_from(10), 0)) == as_u64(neg_from(10)), 0);
+        assert!(
+            as_u64(shl(neg_from(10), 0)) == as_u64(neg_from(10)),
+            0
+        );
 
         assert!(as_u64(shl(from(10), 1)) == 20, 0);
-        assert!(as_u64(shl(neg_from(10), 1)) == as_u64(neg_from(20)), 0);
+        assert!(
+            as_u64(shl(neg_from(10), 1)) == as_u64(neg_from(20)),
+            0
+        );
 
         assert!(as_u64(shl(from(10), 8)) == 2560, 0);
-        assert!(as_u64(shl(neg_from(10), 8)) == as_u64(neg_from(2560)), 0);
+        assert!(
+            as_u64(shl(neg_from(10), 8)) == as_u64(neg_from(2560)),
+            0
+        );
 
         assert!(as_u64(shl(from(10), 32)) == 42949672960, 0);
-        assert!(as_u64(shl(neg_from(10), 32)) == as_u64(neg_from(42949672960)), 0);
+        assert!(
+            as_u64(shl(neg_from(10), 32)) == as_u64(neg_from(42949672960)),
+            0
+        );
 
         assert!(as_u64(shl(from(10), 63)) == 0, 0);
         assert!(as_u64(shl(neg_from(10), 63)) == 0, 0);
@@ -428,19 +625,40 @@ module integer_mate::i64 {
     #[test]
     fun test_shr() {
         assert!(as_u64(shr(from(10), 0)) == 10, 0);
-        assert!(as_u64(shr(neg_from(10), 0)) == as_u64(neg_from(10)), 0);
+        assert!(
+            as_u64(shr(neg_from(10), 0)) == as_u64(neg_from(10)),
+            0
+        );
 
         assert!(as_u64(shr(from(10), 1)) == 5, 0);
-        assert!(as_u64(shr(neg_from(10), 1)) == as_u64(neg_from(5)), 0);
+        assert!(
+            as_u64(shr(neg_from(10), 1)) == as_u64(neg_from(5)),
+            0
+        );
 
-        assert!(as_u64(shr(from(MAX_AS_U64), 8)) == 36028797018963967, 0);
-        assert!(as_u64(shr(neg_from(MIN_AS_U64), 8)) == 0xff80000000000000, 0);
+        assert!(
+            as_u64(shr(from(MAX_AS_U64), 8)) == 36028797018963967,
+            0
+        );
+        assert!(
+            as_u64(shr(neg_from(MIN_AS_U64), 8)) == 0xff80000000000000,
+            0
+        );
 
-        assert!(as_u64(shr(from(MAX_AS_U64), 32)) == 2147483647, 0);
-        assert!(as_u64(shr(neg_from(MIN_AS_U64), 32)) == 0xffffffff80000000, 0);
+        assert!(
+            as_u64(shr(from(MAX_AS_U64), 32)) == 2147483647,
+            0
+        );
+        assert!(
+            as_u64(shr(neg_from(MIN_AS_U64), 32)) == 0xffffffff80000000,
+            0
+        );
 
         assert!(as_u64(shr(from(MAX_AS_U64), 63)) == 0, 0);
-        assert!(as_u64(shr(neg_from(MIN_AS_U64), 63)) == 0xffffffffffffffff, 0);
+        assert!(
+            as_u64(shr(neg_from(MIN_AS_U64), 63)) == 0xffffffffffffffff,
+            0
+        );
     }
 
     #[test]
@@ -458,14 +676,32 @@ module integer_mate::i64 {
         assert!(cmp(neg_from(0), neg_from(1)) == GT, 0);
         assert!(cmp(neg_from(1), neg_from(0)) == LT, 0);
 
-        assert!(cmp(neg_from(MIN_AS_U64), from(MAX_AS_U64)) == LT, 0);
-        assert!(cmp(from(MAX_AS_U64), neg_from(MIN_AS_U64)) == GT, 0);
+        assert!(
+            cmp(neg_from(MIN_AS_U64), from(MAX_AS_U64)) == LT,
+            0
+        );
+        assert!(
+            cmp(from(MAX_AS_U64), neg_from(MIN_AS_U64)) == GT,
+            0
+        );
 
-        assert!(cmp(from(MAX_AS_U64), from(MAX_AS_U64 - 1)) == GT, 0);
-        assert!(cmp(from(MAX_AS_U64 - 1), from(MAX_AS_U64)) == LT, 0);
+        assert!(
+            cmp(from(MAX_AS_U64), from(MAX_AS_U64 - 1)) == GT,
+            0
+        );
+        assert!(
+            cmp(from(MAX_AS_U64 - 1), from(MAX_AS_U64)) == LT,
+            0
+        );
 
-        assert!(cmp(neg_from(MIN_AS_U64), neg_from(MIN_AS_U64 - 1)) == LT, 0);
-        assert!(cmp(neg_from(MIN_AS_U64 - 1), neg_from(MIN_AS_U64)) == GT, 0);
+        assert!(
+            cmp(neg_from(MIN_AS_U64), neg_from(MIN_AS_U64 - 1)) == LT,
+            0
+        );
+        assert!(
+            cmp(neg_from(MIN_AS_U64 - 1), neg_from(MIN_AS_U64)) == GT,
+            0
+        );
     }
 
     #[test]
@@ -489,4 +725,3 @@ module integer_mate::i64 {
         assert!(cmp(i, from(2)) == EQ, 0);
     }
 }
-

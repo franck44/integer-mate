@@ -33,12 +33,11 @@ module integer_mate::full_math_u128 {
             math_u128::lo(lo),
             math_u128::hi(lo),
             math_u128::lo(hi),
-            math_u128::hi(hi),
+            math_u128::hi(hi)
         )
     }
 
     public fun full_mul_v2(num1: u128, num2: u128): u256 {
         (num1 as u256) * (num2 as u256)
     }
-
 }
