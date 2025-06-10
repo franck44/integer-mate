@@ -16,6 +16,7 @@ spec integer_mate::math_u64 {
         ensures result_2 <==>
             ((n1 as u128) + (n2 as u128) as u128) > ((MAX_U64) as u128);
         ensures !result_2 ==> result_1 == n1 + n2;
-        ensures result_2 ==> n1 > result_1;
+        ensures result_2 ==>
+            ((n1 as u256) + (n2 as u256)) % (TWO_TO_THE_64 as u256) >= 0;
     }
 }

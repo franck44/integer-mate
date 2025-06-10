@@ -6,6 +6,12 @@ module integer_mate::math_u128 {
     const LO_64_MASK: u128 = 0x0000000000000000ffffffffffffffff;
     const LO_128_MASK: u256 =
         0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
+    // 0xffffffffffffffffffffffffffffffff
+
+    // Powers of two
+    const TWO_TO_THE_64: u256 = 0x1_00000000_00000000;
+    const TWO_TO_THE_128: u256 = 0x1_00000000_00000000_00000000_00000000;
+    const TWO_TO_THE_192: u256 = 0x1_00000000_00000000_00000000_00000000_00000000_00000000;
 
     const DIV_BY_ZERO: u64 = 1;
 

@@ -4,6 +4,10 @@ module integer_mate::math_u64 {
     const HI_64_MASK: u128 = 0xffffffffffffffff0000000000000000;
     const LO_64_MASK: u128 = 0x0000000000000000ffffffffffffffff;
 
+    // Powers of two
+    const TWO_TO_THE_64: u256 = 0x1_00000000_00000000;
+    const TWO_TO_THE_192: u256 = 0x1_00000000_00000000_00000000_00000000_00000000_00000000;
+
     public fun wrapping_add(n1: u64, n2: u64): u64 {
         let (sum, _) = overflowing_add(n1, n2);
         sum
