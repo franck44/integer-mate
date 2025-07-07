@@ -13,30 +13,22 @@ module integer_mate::i32 {
     }
 
     public fun zero(): I32 {
-        I32 {
-            bits: 0
-        }
+        I32 { bits: 0 }
     }
 
     public fun from_u32(v: u32): I32 {
-        I32 {
-            bits: v
-        }
+        I32 { bits: v }
     }
 
     public fun from(v: u32): I32 {
         assert!(v <= MAX_AS_U32, EOverflow);
-        I32 {
-            bits: v
-        }
+        I32 { bits: v }
     }
 
     public fun neg_from(v: u32): I32 {
         assert!(v <= MIN_AS_U32, EOverflow);
         if (v == 0) {
-            I32 {
-                bits: v
-            }
+            I32 { bits: v }
         } else {
             I32 {
                 bits: (u32_neg(v) + 1) | (1 << 31)
@@ -53,30 +45,25 @@ module integer_mate::i32 {
             sum = a ^ b;
             carry = (a & b) << 1;
         };
-        I32 {
-            bits: sum
-        }
+        I32 { bits: sum }
     }
 
     public fun add(num1: I32, num2: I32): I32 {
         let sum = wrapping_add(num1, num2);
-        let overflow = (sign(num1) & sign(num2) & u8_neg(sign(sum))) +
-                (u8_neg(sign(num1)) & u8_neg(sign(num2)) & sign(sum));
+        let overflow =
+            (sign(num1) & sign(num2) & u8_neg(sign(sum)))
+                + (u8_neg(sign(num1)) & u8_neg(sign(num2)) & sign(sum));
         assert!(overflow == 0, EOverflow);
         sum
     }
 
     public fun wrapping_sub(num1: I32, num2: I32): I32 {
-        let sub_num = wrapping_add(I32 {
-            bits: u32_neg(num2.bits)
-        }, from(1));
+        let sub_num = wrapping_add(I32 { bits: u32_neg(num2.bits) }, from(1));
         wrapping_add(num1, sub_num)
     }
 
     public fun sub(num1: I32, num2: I32): I32 {
-        let sub_num = wrapping_add(I32 {
-            bits: u32_neg(num2.bits)
-        }, from(1));
+        let sub_num = wrapping_add(I32 { bits: u32_neg(num2.bits) }, from(1));
         add(num1, sub_num)
     }
 
@@ -97,28 +84,22 @@ module integer_mate::i32 {
     }
 
     public fun abs(v: I32): I32 {
-        if (sign(v) == 0) {
-            v
-        } else {
+        if (sign(v) == 0) { v }
+        else {
             assert!(v.bits > MIN_AS_U32, EOverflow);
-            I32 {
-                bits: u32_neg(v.bits - 1)
-            }
+            I32 { bits: u32_neg(v.bits - 1) }
         }
     }
 
     public fun abs_u32(v: I32): u32 {
-        if (sign(v) == 0) {
-            v.bits
-        } else {
+        if (sign(v) == 0) { v.bits }
+        else {
             u32_neg(v.bits - 1)
         }
     }
 
     public fun shl(v: I32, shift: u8): I32 {
-        I32 {
-            bits: v.bits << shift
-        }
+        I32 { bits: v.bits << shift }
     }
 
     public fun shr(v: I32, shift: u8): I32 {
@@ -127,13 +108,9 @@ module integer_mate::i32 {
         };
         let mask = 0xffffffff << (32 - shift);
         if (sign(v) == 1) {
-            return I32 {
-                bits: (v.bits >> shift) | mask
-            }
+            return I32 { bits: (v.bits >> shift) | mask }
         };
-        I32 {
-            bits: v.bits >> shift
-        }
+        I32 { bits: v.bits >> shift }
     }
 
     public fun mod(v: I32, n: I32): I32 {
@@ -188,15 +165,11 @@ module integer_mate::i32 {
     }
 
     public fun or(num1: I32, num2: I32): I32 {
-        I32 {
-            bits: (num1.bits | num2.bits)
-        }
+        I32 { bits: (num1.bits | num2.bits) }
     }
 
     public fun and(num1: I32, num2: I32): I32 {
-        I32 {
-            bits: (num1.bits & num2.bits)
-        }
+        I32 { bits: (num1.bits & num2.bits) }
     }
 
     fun u32_neg(v: u32): u32 {
@@ -239,7 +212,10 @@ module integer_mate::i32 {
         assert!(as_u32(from(10)) == 10u32, 0);
         assert!(as_u32(abs(neg_from(10))) == 10u32, 1);
         assert!(as_u32(abs(neg_from(0))) == 0u32, 2);
-        assert!(as_u32(abs(neg_from(0x7fffffff))) == 0x7fffffff, 3);
+        assert!(
+            as_u32(abs(neg_from(0x7fffffff))) == 0x7fffffff,
+            3
+        );
         assert!(as_u32(neg_from(MIN_AS_U32)) == MIN_AS_U32, 4);
     }
 
@@ -253,28 +229,88 @@ module integer_mate::i32 {
     fun test_wrapping_add() {
         assert!(as_u32(wrapping_add(from(0), from(1))) == 1, 0);
         assert!(as_u32(wrapping_add(from(1), from(0))) == 1, 0);
-        assert!(as_u32(wrapping_add(from(10000), from(99999))) == 109999, 0);
-        assert!(as_u32(wrapping_add(from(99999), from(10000))) == 109999, 0);
-        assert!(as_u32(wrapping_add(from(MAX_AS_U32 - 1), from(1))) == MAX_AS_U32, 0);
+        assert!(
+            as_u32(wrapping_add(from(10000), from(99999))) == 109999,
+            0
+        );
+        assert!(
+            as_u32(wrapping_add(from(99999), from(10000))) == 109999,
+            0
+        );
+        assert!(
+            as_u32(wrapping_add(from(MAX_AS_U32 - 1), from(1))) == MAX_AS_U32,
+            0
+        );
         assert!(as_u32(wrapping_add(from(0), from(0))) == 0, 0);
 
-        assert!(as_u32(wrapping_add(neg_from(0), neg_from(0))) == 0, 1);
-        assert!(as_u32(wrapping_add(neg_from(1), neg_from(0))) == 0xffffffff, 1);
-        assert!(as_u32(wrapping_add(neg_from(0), neg_from(1))) == 0xffffffff, 1);
-        assert!(as_u32(wrapping_add(neg_from(10000), neg_from(99999))) == 0xfffe5251, 1);
-        assert!(as_u32(wrapping_add(neg_from(99999), neg_from(10000))) == 0xfffe5251, 1);
-        assert!(as_u32(wrapping_add(neg_from(MIN_AS_U32 - 1), neg_from(1))) == MIN_AS_U32, 1);
+        assert!(
+            as_u32(wrapping_add(neg_from(0), neg_from(0))) == 0,
+            1
+        );
+        assert!(
+            as_u32(wrapping_add(neg_from(1), neg_from(0))) == 0xffffffff,
+            1
+        );
+        assert!(
+            as_u32(wrapping_add(neg_from(0), neg_from(1))) == 0xffffffff,
+            1
+        );
+        assert!(
+            as_u32(
+                wrapping_add(neg_from(10000), neg_from(99999))
+            ) == 0xfffe5251,
+            1
+        );
+        assert!(
+            as_u32(
+                wrapping_add(neg_from(99999), neg_from(10000))
+            ) == 0xfffe5251,
+            1
+        );
+        assert!(
+            as_u32(
+                wrapping_add(neg_from(MIN_AS_U32 - 1), neg_from(1))
+            ) == MIN_AS_U32,
+            1
+        );
 
-        assert!(as_u32(wrapping_add(from(0), neg_from(0))) == 0, 2);
-        assert!(as_u32(wrapping_add(neg_from(0), from(0))) == 0, 2);
-        assert!(as_u32(wrapping_add(neg_from(1), from(1))) == 0, 2);
-        assert!(as_u32(wrapping_add(from(1), neg_from(1))) == 0, 2);
-        assert!(as_u32(wrapping_add(from(10000), neg_from(99999))) == 0xfffea071, 2);
-        assert!(as_u32(wrapping_add(from(99999), neg_from(10000))) == 89999, 2);
-        assert!(as_u32(wrapping_add(neg_from(MIN_AS_U32), from(1))) == 0x80000001, 2);
-        assert!(as_u32(wrapping_add(from(MAX_AS_U32), neg_from(1))) == MAX_AS_U32 - 1, 2);
+        assert!(
+            as_u32(wrapping_add(from(0), neg_from(0))) == 0,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(neg_from(0), from(0))) == 0,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(neg_from(1), from(1))) == 0,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(from(1), neg_from(1))) == 0,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(from(10000), neg_from(99999))) == 0xfffea071,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(from(99999), neg_from(10000))) == 89999,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(neg_from(MIN_AS_U32), from(1))) == 0x80000001,
+            2
+        );
+        assert!(
+            as_u32(wrapping_add(from(MAX_AS_U32), neg_from(1))) == MAX_AS_U32 - 1,
+            2
+        );
 
-        assert!(as_u32(wrapping_add(from(MAX_AS_U32), from(1))) == MIN_AS_U32, 2);
+        assert!(
+            as_u32(wrapping_add(from(MAX_AS_U32), from(1))) == MIN_AS_U32,
+            2
+        );
     }
 
     #[test]
@@ -282,25 +318,61 @@ module integer_mate::i32 {
         assert!(as_u32(add(from(0), from(0))) == 0, 0);
         assert!(as_u32(add(from(0), from(1))) == 1, 0);
         assert!(as_u32(add(from(1), from(0))) == 1, 0);
-        assert!(as_u32(add(from(10000), from(99999))) == 109999, 0);
-        assert!(as_u32(add(from(99999), from(10000))) == 109999, 0);
-        assert!(as_u32(add(from(MAX_AS_U32 - 1), from(1))) == MAX_AS_U32, 0);
+        assert!(
+            as_u32(add(from(10000), from(99999))) == 109999,
+            0
+        );
+        assert!(
+            as_u32(add(from(99999), from(10000))) == 109999,
+            0
+        );
+        assert!(
+            as_u32(add(from(MAX_AS_U32 - 1), from(1))) == MAX_AS_U32,
+            0
+        );
 
         assert!(as_u32(add(neg_from(0), neg_from(0))) == 0, 1);
-        assert!(as_u32(add(neg_from(1), neg_from(0))) == 0xffffffff, 1);
-        assert!(as_u32(add(neg_from(0), neg_from(1))) == 0xffffffff, 1);
-        assert!(as_u32(add(neg_from(10000), neg_from(99999))) == 0xfffe5251, 1);
-        assert!(as_u32(add(neg_from(99999), neg_from(10000))) == 0xfffe5251, 1);
-        assert!(as_u32(add(neg_from(MIN_AS_U32 - 1), neg_from(1))) == MIN_AS_U32, 1);
+        assert!(
+            as_u32(add(neg_from(1), neg_from(0))) == 0xffffffff,
+            1
+        );
+        assert!(
+            as_u32(add(neg_from(0), neg_from(1))) == 0xffffffff,
+            1
+        );
+        assert!(
+            as_u32(add(neg_from(10000), neg_from(99999))) == 0xfffe5251,
+            1
+        );
+        assert!(
+            as_u32(add(neg_from(99999), neg_from(10000))) == 0xfffe5251,
+            1
+        );
+        assert!(
+            as_u32(add(neg_from(MIN_AS_U32 - 1), neg_from(1))) == MIN_AS_U32,
+            1
+        );
 
         assert!(as_u32(add(from(0), neg_from(0))) == 0, 2);
         assert!(as_u32(add(neg_from(0), from(0))) == 0, 2);
         assert!(as_u32(add(neg_from(1), from(1))) == 0, 2);
         assert!(as_u32(add(from(1), neg_from(1))) == 0, 2);
-        assert!(as_u32(add(from(10000), neg_from(99999))) == 0xfffea071, 2);
-        assert!(as_u32(add(from(99999), neg_from(10000))) == 89999, 2);
-        assert!(as_u32(add(neg_from(MIN_AS_U32), from(1))) == 0x80000001, 2);
-        assert!(as_u32(add(from(MAX_AS_U32), neg_from(1))) == MAX_AS_U32 - 1, 2);
+        assert!(
+            as_u32(add(from(10000), neg_from(99999))) == 0xfffea071,
+            2
+        );
+        assert!(
+            as_u32(add(from(99999), neg_from(10000))) == 89999,
+            2
+        );
+        assert!(
+            as_u32(add(neg_from(MIN_AS_U32), from(1))) == 0x80000001,
+            2
+        );
+        assert!(
+            as_u32(add(from(MAX_AS_U32), neg_from(1))) == MAX_AS_U32 - 1,
+            2
+        );
     }
 
     #[test]
@@ -319,34 +391,109 @@ module integer_mate::i32 {
     fun test_wrapping_sub() {
         assert!(as_u32(wrapping_sub(from(0), from(0))) == 0, 0);
         assert!(as_u32(wrapping_sub(from(1), from(0))) == 1, 0);
-        assert!(as_u32(wrapping_sub(from(0), from(1))) == as_u32(neg_from(1)), 0);
-        assert!(as_u32(wrapping_sub(from(1), from(1))) == as_u32(neg_from(0)), 0);
-        assert!(as_u32(wrapping_sub(from(1), neg_from(1))) == as_u32(from(2)), 0);
-        assert!(as_u32(wrapping_sub(neg_from(1), from(1))) == as_u32(neg_from(2)), 0);
-        assert!(as_u32(wrapping_sub(from(1000000), from(1))) == 999999, 0);
-        assert!(as_u32(wrapping_sub(neg_from(1000000), neg_from(1))) == as_u32(neg_from(999999)), 0);
-        assert!(as_u32(wrapping_sub(from(1), from(1000000))) == as_u32(neg_from(999999)), 0);
-        assert!(as_u32(wrapping_sub(from(MAX_AS_U32), from(MAX_AS_U32))) == as_u32(from(0)), 0);
-        assert!(as_u32(wrapping_sub(from(MAX_AS_U32), from(1))) == as_u32(from(MAX_AS_U32 - 1)), 0);
-        assert!(as_u32(wrapping_sub(from(MAX_AS_U32), neg_from(1))) == as_u32(neg_from(MIN_AS_U32)), 0);
-        assert!(as_u32(wrapping_sub(neg_from(MIN_AS_U32), neg_from(1))) == as_u32(neg_from(MIN_AS_U32 - 1)), 0);
-        assert!(as_u32(wrapping_sub(neg_from(MIN_AS_U32), from(1))) == as_u32(from(MAX_AS_U32)), 0);
+        assert!(
+            as_u32(wrapping_sub(from(0), from(1))) == as_u32(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(1), from(1))) == as_u32(neg_from(0)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(1), neg_from(1))) == as_u32(from(2)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(neg_from(1), from(1))) == as_u32(neg_from(2)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(1000000), from(1))) == 999999,
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(neg_from(1000000), neg_from(1)))
+                == as_u32(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(1), from(1000000))) == as_u32(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u32(
+                wrapping_sub(from(MAX_AS_U32), from(MAX_AS_U32))
+            ) == as_u32(from(0)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(MAX_AS_U32), from(1)))
+                == as_u32(from(MAX_AS_U32 - 1)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(from(MAX_AS_U32), neg_from(1)))
+                == as_u32(neg_from(MIN_AS_U32)),
+            0
+        );
+        assert!(
+            as_u32(
+                wrapping_sub(neg_from(MIN_AS_U32), neg_from(1))
+            ) == as_u32(neg_from(MIN_AS_U32 - 1)),
+            0
+        );
+        assert!(
+            as_u32(wrapping_sub(neg_from(MIN_AS_U32), from(1)))
+                == as_u32(from(MAX_AS_U32)),
+            0
+        );
     }
 
     #[test]
     fun test_sub() {
         assert!(as_u32(sub(from(0), from(0))) == 0, 0);
         assert!(as_u32(sub(from(1), from(0))) == 1, 0);
-        assert!(as_u32(sub(from(0), from(1))) == as_u32(neg_from(1)), 0);
-        assert!(as_u32(sub(from(1), from(1))) == as_u32(neg_from(0)), 0);
-        assert!(as_u32(sub(from(1), neg_from(1))) == as_u32(from(2)), 0);
-        assert!(as_u32(sub(neg_from(1), from(1))) == as_u32(neg_from(2)), 0);
-        assert!(as_u32(sub(from(1000000), from(1))) == 999999, 0);
-        assert!(as_u32(sub(neg_from(1000000), neg_from(1))) == as_u32(neg_from(999999)), 0);
-        assert!(as_u32(sub(from(1), from(1000000))) == as_u32(neg_from(999999)), 0);
-        assert!(as_u32(sub(from(MAX_AS_U32), from(MAX_AS_U32))) == as_u32(from(0)), 0);
-        assert!(as_u32(sub(from(MAX_AS_U32), from(1))) == as_u32(from(MAX_AS_U32 - 1)), 0);
-        assert!(as_u32(sub(neg_from(MIN_AS_U32), neg_from(1))) == as_u32(neg_from(MIN_AS_U32 - 1)), 0);
+        assert!(
+            as_u32(sub(from(0), from(1))) == as_u32(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(1), from(1))) == as_u32(neg_from(0)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(1), neg_from(1))) == as_u32(from(2)),
+            0
+        );
+        assert!(
+            as_u32(sub(neg_from(1), from(1))) == as_u32(neg_from(2)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(1000000), from(1))) == 999999,
+            0
+        );
+        assert!(
+            as_u32(sub(neg_from(1000000), neg_from(1))) == as_u32(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(1), from(1000000))) == as_u32(neg_from(999999)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(MAX_AS_U32), from(MAX_AS_U32))) == as_u32(from(0)),
+            0
+        );
+        assert!(
+            as_u32(sub(from(MAX_AS_U32), from(1))) == as_u32(from(MAX_AS_U32 - 1)),
+            0
+        );
+        assert!(
+            as_u32(sub(neg_from(MIN_AS_U32), neg_from(1)))
+                == as_u32(neg_from(MIN_AS_U32 - 1)),
+            0
+        );
     }
 
     #[test]
@@ -366,18 +513,48 @@ module integer_mate::i32 {
         assert!(as_u32(mul(from(1), from(1))) == 1, 0);
         assert!(as_u32(mul(from(10), from(10))) == 100, 0);
         assert!(as_u32(mul(from(100), from(100))) == 10000, 0);
-        assert!(as_u32(mul(from(10000), from(10000))) == 100000000, 0);
+        assert!(
+            as_u32(mul(from(10000), from(10000))) == 100000000,
+            0
+        );
 
-        assert!(as_u32(mul(neg_from(1), from(1))) == as_u32(neg_from(1)), 0);
-        assert!(as_u32(mul(neg_from(10), from(10))) == as_u32(neg_from(100)), 0);
-        assert!(as_u32(mul(neg_from(100), from(100))) == as_u32(neg_from(10000)), 0);
-        assert!(as_u32(mul(neg_from(10000), from(10000))) == as_u32(neg_from(100000000)), 0);
+        assert!(
+            as_u32(mul(neg_from(1), from(1))) == as_u32(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u32(mul(neg_from(10), from(10))) == as_u32(neg_from(100)),
+            0
+        );
+        assert!(
+            as_u32(mul(neg_from(100), from(100))) == as_u32(neg_from(10000)),
+            0
+        );
+        assert!(
+            as_u32(mul(neg_from(10000), from(10000))) == as_u32(neg_from(100000000)),
+            0
+        );
 
-        assert!(as_u32(mul(from(1), neg_from(1))) == as_u32(neg_from(1)), 0);
-        assert!(as_u32(mul(from(10), neg_from(10))) == as_u32(neg_from(100)), 0);
-        assert!(as_u32(mul(from(100), neg_from(100))) == as_u32(neg_from(10000)), 0);
-        assert!(as_u32(mul(from(10000), neg_from(10000))) == as_u32(neg_from(100000000)), 0);
-        assert!(as_u32(mul(from(MIN_AS_U32 / 2), neg_from(2))) == as_u32(neg_from(MIN_AS_U32)), 0);
+        assert!(
+            as_u32(mul(from(1), neg_from(1))) == as_u32(neg_from(1)),
+            0
+        );
+        assert!(
+            as_u32(mul(from(10), neg_from(10))) == as_u32(neg_from(100)),
+            0
+        );
+        assert!(
+            as_u32(mul(from(100), neg_from(100))) == as_u32(neg_from(10000)),
+            0
+        );
+        assert!(
+            as_u32(mul(from(10000), neg_from(10000))) == as_u32(neg_from(100000000)),
+            0
+        );
+        assert!(
+            as_u32(mul(from(MIN_AS_U32 / 2), neg_from(2))) == as_u32(neg_from(MIN_AS_U32)),
+            0
+        );
     }
 
     #[test]
@@ -391,11 +568,20 @@ module integer_mate::i32 {
     fun test_div() {
         assert!(as_u32(div(from(0), from(1))) == 0, 0);
         assert!(as_u32(div(from(10), from(1))) == 10, 0);
-        assert!(as_u32(div(from(10), neg_from(1))) == as_u32(neg_from(10)), 0);
-        assert!(as_u32(div(neg_from(10), neg_from(1))) == as_u32(from(10)), 0);
+        assert!(
+            as_u32(div(from(10), neg_from(1))) == as_u32(neg_from(10)),
+            0
+        );
+        assert!(
+            as_u32(div(neg_from(10), neg_from(1))) == as_u32(from(10)),
+            0
+        );
 
         assert!(abs_u32(neg_from(MIN_AS_U32)) == MIN_AS_U32, 0);
-        assert!(as_u32(div(neg_from(MIN_AS_U32), from(1))) == MIN_AS_U32, 0);
+        assert!(
+            as_u32(div(neg_from(MIN_AS_U32), from(1))) == MIN_AS_U32,
+            0
+        );
     }
 
     #[test]
@@ -407,13 +593,22 @@ module integer_mate::i32 {
     #[test]
     fun test_shl() {
         assert!(as_u32(shl(from(10), 0)) == 10, 0);
-        assert!(as_u32(shl(neg_from(10), 0)) == as_u32(neg_from(10)), 0);
+        assert!(
+            as_u32(shl(neg_from(10), 0)) == as_u32(neg_from(10)),
+            0
+        );
 
         assert!(as_u32(shl(from(10), 1)) == 20, 0);
-        assert!(as_u32(shl(neg_from(10), 1)) == as_u32(neg_from(20)), 0);
+        assert!(
+            as_u32(shl(neg_from(10), 1)) == as_u32(neg_from(20)),
+            0
+        );
 
         assert!(as_u32(shl(from(10), 8)) == 2560, 0);
-        assert!(as_u32(shl(neg_from(10), 8)) == as_u32(neg_from(2560)), 0);
+        assert!(
+            as_u32(shl(neg_from(10), 8)) == as_u32(neg_from(2560)),
+            0
+        );
 
         assert!(as_u32(shl(from(10), 31)) == 0, 0);
         assert!(as_u32(shl(neg_from(10), 31)) == 0, 0);
@@ -422,13 +617,25 @@ module integer_mate::i32 {
     #[test]
     fun test_shr() {
         assert!(as_u32(shr(from(10), 0)) == 10, 0);
-        assert!(as_u32(shr(neg_from(10), 0)) == as_u32(neg_from(10)), 0);
+        assert!(
+            as_u32(shr(neg_from(10), 0)) == as_u32(neg_from(10)),
+            0
+        );
 
         assert!(as_u32(shr(from(10), 1)) == 5, 0);
-        assert!(as_u32(shr(neg_from(10), 1)) == as_u32(neg_from(5)), 0);
+        assert!(
+            as_u32(shr(neg_from(10), 1)) == as_u32(neg_from(5)),
+            0
+        );
 
-        assert!(as_u32(shr(from(MAX_AS_U32), 8)) == MAX_AS_U32 >> 8, 0);
-        assert!(as_u32(shr(neg_from(MIN_AS_U32), 8)) == 0xff800000, 0);
+        assert!(
+            as_u32(shr(from(MAX_AS_U32), 8)) == MAX_AS_U32 >> 8,
+            0
+        );
+        assert!(
+            as_u32(shr(neg_from(MIN_AS_U32), 8)) == 0xff800000,
+            0
+        );
     }
 
     #[test]
@@ -446,14 +653,32 @@ module integer_mate::i32 {
         assert!(cmp(neg_from(0), neg_from(1)) == GT, 0);
         assert!(cmp(neg_from(1), neg_from(0)) == LT, 0);
 
-        assert!(cmp(neg_from(MIN_AS_U32), from(MAX_AS_U32)) == LT, 0);
-        assert!(cmp(from(MAX_AS_U32), neg_from(MIN_AS_U32)) == GT, 0);
+        assert!(
+            cmp(neg_from(MIN_AS_U32), from(MAX_AS_U32)) == LT,
+            0
+        );
+        assert!(
+            cmp(from(MAX_AS_U32), neg_from(MIN_AS_U32)) == GT,
+            0
+        );
 
-        assert!(cmp(from(MAX_AS_U32), from(MAX_AS_U32 - 1)) == GT, 0);
-        assert!(cmp(from(MAX_AS_U32 - 1), from(MAX_AS_U32)) == LT, 0);
+        assert!(
+            cmp(from(MAX_AS_U32), from(MAX_AS_U32 - 1)) == GT,
+            0
+        );
+        assert!(
+            cmp(from(MAX_AS_U32 - 1), from(MAX_AS_U32)) == LT,
+            0
+        );
 
-        assert!(cmp(neg_from(MIN_AS_U32), neg_from(MIN_AS_U32 - 1)) == LT, 0);
-        assert!(cmp(neg_from(MIN_AS_U32 - 1), neg_from(MIN_AS_U32)) == GT, 0);
+        assert!(
+            cmp(neg_from(MIN_AS_U32), neg_from(MIN_AS_U32 - 1)) == LT,
+            0
+        );
+        assert!(
+            cmp(neg_from(MIN_AS_U32 - 1), neg_from(MIN_AS_U32)) == GT,
+            0
+        );
     }
 
     #[test]
@@ -477,4 +702,3 @@ module integer_mate::i32 {
         assert!(cmp(i, from(2)) == EQ, 0);
     }
 }
-
